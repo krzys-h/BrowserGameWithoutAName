@@ -63,17 +63,18 @@ Map.prototype.update = function()
 
 Map.prototype.renderChunk = function(chunk, map_x, map_y)
 {
-	var data = chunk.data;
-	var imageData = this.ctx.createImageData(data.length, data[0].length);
-	for(var i = 0; i < data.length; i++) {
-		for(var j = 0; j < data[i].length; j++) {
-			var index = 4*(i+j*data.length);
-			for(var k = 0; k <= 2; k++)
-				imageData.data[index+k] = data[i][j]*255;
-			imageData.data[index+3] = 255;
+	if(typeof chunk.imageData == "undefined") {
+		chunk.imageData = this.ctx.createImageData(64, 64);
+		for(var i = 0; i < 64; i++) {
+			for(var j = 0; j < 64; j++) {
+				var index = 4*(i+j*64);
+				for(var k = 0; k <= 2; k++)
+					chunk.imageData.data[index+k] = chunk.getAt(i, j)*255;
+				chunk.imageData.data[index+3] = 255;
+			}
 		}
 	}
-	this.ctx.putImageData(imageData, map_x, map_y);
+	this.ctx.putImageData(chunk.imageData, map_x, map_y);
 }
 
 Map.prototype.generatorData = function(data) {

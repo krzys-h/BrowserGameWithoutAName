@@ -93,7 +93,13 @@ io.on('connection', function(socket) {
 	function sendChunk(x, y) {
 		var send = function() {
 			var chunk = terrain.chunks[x][y];
-			var chunkdata = {x: chunk.x, y: chunk.y, data: chunk.data};
+			var chunkdata = {x: chunk.x, y: chunk.y, data: []};
+			for(var bx = 0; bx < 64; bx++) {
+				chunkdata.data[bx] = [];
+				for(var by = 0; by < 64; by++) {
+					chunkdata.data[bx][by] = chunk.getAt(x, y);
+				}
+			}
 			socket.emit('terrain', chunkdata);
 		}	
 		if(terrain.chunkLoaded(x, y)) {

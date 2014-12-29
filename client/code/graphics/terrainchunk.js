@@ -1,14 +1,13 @@
 function TerrainChunk(chunk, scene, material) {
 	this.x = chunk.x;
 	this.y = chunk.y;
-	this.data = chunk.data;
 	this.material = material;
 	
 	this.geometry = new THREE.PlaneGeometry(64, 64, 64, 64);
 	this.geometry.dynamic = true;
 	for(var x = 0; x < 64; x++) {
 		for(var y = 0; y < 64; y++) {
-			this.geometry.vertices[y*65+x].z = -20 + this.data[x][y] * 20;
+			this.setAt(x, y, chunk.data[x][y]);
 		}
 	}
 	
@@ -35,6 +34,14 @@ TerrainChunk.prototype.align = function(axis, other) {
 		this.geometry.vertices[64*65+64].z = other.geometry.vertices[0*65+63].z; //TODO: this still leaves small holes
 	}
 	this.geometry.verticesNeedUpdate = true;
+}
+
+TerrainChunk.prototype.getAt = function(x, y) {
+	return (this.geometry.vertices[y*65+x].z+20)/20;
+}
+
+TerrainChunk.prototype.setAt = function(x, y, v) {
+	this.geometry.vertices[y*65+x].z = -20 + v * 20;
 }
 
 if(typeof module !== 'undefined') module.exports = TerrainChunk;
