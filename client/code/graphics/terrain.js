@@ -34,4 +34,11 @@ Terrain.prototype.chunkLoaded = function(x, y) {
 	return true;
 }
 
+Terrain.prototype.unloadChunk = function(x, y) {
+	if(!this.chunkLoaded(x, y)) return;
+	this.scene.remove(this.chunks[x][y].object);
+	this.chunks[x][y].unload();
+	delete this.chunks[x][y];
+}
+
 if(typeof module !== 'undefined') module.exports = Terrain;

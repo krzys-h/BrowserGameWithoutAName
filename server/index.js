@@ -54,7 +54,7 @@ var terrainloader = new TerrainLoader(terrain, function(x, y) {
 		terraingen.generate(x, y);
 	}
 });
-terrainloader.load(0, 0, 10);
+terrainloader.load(0, 0, 5);
 
 var io = require('socket.io').listen(Config.SERVER_PORT);
 console.log('Successfully started socket.io server at '+Config.SERVER_HOST+':'+Config.SERVER_PORT)
@@ -97,7 +97,7 @@ io.on('connection', function(socket) {
 			for(var bx = 0; bx < 64; bx++) {
 				chunkdata.data[bx] = [];
 				for(var by = 0; by < 64; by++) {
-					chunkdata.data[bx][by] = chunk.getAt(x, y);
+					chunkdata.data[bx][by] = chunk.getAt(bx, by);
 				}
 			}
 			socket.emit('terrain', chunkdata);
@@ -154,6 +154,8 @@ setInterval(function() {
 var timer = new FPS();
 function physics() {
 	var dt = timer.update();
+	
+	terrainloader.load(0, 0, 5);
 	for(var i=0; i<playerObjects.length; i++) {
 		var player = playerObjects[i].object;
 		var input = playerObjects[i].input;
@@ -178,8 +180,9 @@ function physics() {
 		
 		var cx = Math.floor((player.object.position.x+32)/64);
 		var cy = Math.floor((-player.object.position.z+32)/64);
-		terrainloader.load(cx, cy, 10);
+		terrainloader.load(cx, cy, 7);
 	}
+	terrainloader.autoUnload();
 	scene.simulate();
 	
 	var objdata = [];

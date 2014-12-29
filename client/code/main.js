@@ -77,6 +77,7 @@ function update(dt) {
 		var cx = Math.floor((game.player.object.position.x+32)/64);
 		var cy = Math.floor((-game.player.object.position.z+32)/64);
 		terrainloader.load(cx, cy, 5);
+		terrainloader.autoUnload();
 		
 		var s = "";
 		if(terrainloader.queue.length > 0) s = "Loading chunks: ";

@@ -44,4 +44,20 @@ TerrainChunk.prototype.setAt = function(x, y, v) {
 	this.geometry.vertices[y*65+x].z = -20 + v * 20;
 }
 
+TerrainChunk.prototype.unload = function() {
+	if(typeof this.object._eventListeners.removed != "undefined") {
+		this.object._eventListeners.removed[0]({target: this.object}); //TODO: This is some bug in Physijs/Three.JS, causing a memory leak
+	}
+	delete this.object;
+	if(typeof this.geometry.dispose != "undefined") {
+		this.geometry.dispose();
+	} else {
+		this.geometry.deallocate();
+	}
+	delete this.geometry;
+	if(typeof this.imageData != "undefined") {
+		delete this.imageData;
+	}
+}
+
 if(typeof module !== 'undefined') module.exports = TerrainChunk;
