@@ -12,15 +12,11 @@ function Player(scene, terrain, name, nametag)
 	materialArray.push(new THREE.MeshBasicMaterial({color: 0x33ff33}));
 	materialArray.push(new THREE.MeshBasicMaterial({color: 0x3333ff}));
 	materialArray.push(new THREE.MeshBasicMaterial({color: 0x8833ff}));
-	this.material = Physijs.createMaterial(
-		new THREE.MeshFaceMaterial(materialArray),
-		.4, // medium friction
-		.4 // medium restitution
-	);
+	this.material = new THREE.MeshFaceMaterial(materialArray);
 	
 	this.geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
 	
-	this.object = new Physijs.BoxMesh(this.geometry, this.material);
+	this.object = new Physijs.CapsuleMesh(this.geometry, this.material);
 	this.object.position.set(0, 20, 0);
 	
 	this.object.setCcdMotionThreshold(1);
@@ -58,6 +54,10 @@ Player.prototype.update = function(dt) {
 	var collisions = ray.intersectObjects([this.terrain.object]);
 	this.grounded = collisions.length > 0 && collisions[0].distance < 1;*/
 	this.grounded = true; //TODO
+	
+	this.object.rotation.x = 0;
+	this.object.rotation.z = 0;
+	this.object.__dirtyRotation = true;
 }
 
 if(typeof module !== 'undefined') module.exports = Player;
