@@ -1,0 +1,22 @@
+{
+  "name": "game",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [
+    "game",
+    "3D"
+  ],
+  "homepage": "",
+  "author": {
+    "name": "krzys_h",
+    "email": "krzys_h@interia.pl"
+  },
+  "dependencies": {
+    "socket.io": "~1.2.1",
+    "node-static": "~0.7.6",
+    "socket.io-client": "~1.2.1",
+    "MD5": "~1.2.1"
+  },
+  "engine": "node >= 0.10",
+  "main": "index.js"
+}

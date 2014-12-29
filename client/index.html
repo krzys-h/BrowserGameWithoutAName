@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+	<head>
+		<title>game</title>
+		
+		<script src="/lib/three.js"></script>
+		<script src="/lib/physi.js"></script>
+		<script>
+			Physijs.scripts.worker = '/lib/physijs_worker.js';
+			Physijs.scripts.ammo = '/lib/ammo.js';
+		</script>
+		<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+		<script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
+		<!-- <script src="lib/dat.gui.js"></script> -->
+		
+		<script src="/resources/fonts/helvetiker_regular.typeface.js"></script>
+		<script src="/resources/fonts/helvetiker_italic.typeface.js"></script>
+		<script src="/resources/fonts/helvetiker_bold.typeface.js"></script>
+		<script src="/resources/fonts/helvetiker_bold_italic.typeface.js"></script>
+		
+		<script src="/code/common/fps.js"></script>
+		<script src="/code/graphics/skybox.js"></script>
+		<script src="/code/graphics/terrainchunk.js"></script>
+		<script src="/code/graphics/terrain.js"></script>
+		<script src="/code/controls/keyboard.js"></script>
+		<script src="/code/controls/mouse.js"></script>
+		<script src="/code/controls/input.js"></script>
+		<script src="/code/objects/player.js"></script>
+		<script src="/code/engine/objectmanager.js"></script>
+		<script src="/code/engine/terrainloader.js"></script>
+		<script src="/code/scenes/mainmenu.js"></script>
+		<script src="/code/scenes/game.js"></script>
+		<script src="/code/ui/ui.js"></script>
+		<script src="/code/ui/map.js"></script>
+		<script src="/code/net/connection.js"></script>
+		<script src="/code/main.js"></script>
+		
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				overflow: hidden;
+			}
+			#fps {
+				position: absolute;
+				bottom: 0px;
+				left: 0px;
+				z-index: 100;
+				color: red;
+				font-size: 200%;
+			}
+			#fps_render, #fps_physics, #status {
+				font-style: italic;
+			}
+			#login_form {
+				position: absolute;
+				top: 8px;
+				z-index: 100;
+				margin-left: auto;
+				margin-right: auto;
+				left: 0;
+				right: 0;
+				width: 50%;
+			}
+			#login_form > input, #login_form > button {
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="login_form" style="display: none;">
+			<input id="login" type="text" placeholder="login" /><br />
+			<button onclick="login()">START!</button>
+		</div>
+		<div id="fps">
+			<span id="chunk_state"></span><br />
+			<span id="status"></span><br />
+			<b>Render:</b> <span id="fps_render">?</span> FPS<br />
+			<b>Physics:</b> <span id="fps_physics">?</span> FPS
+		</div>
+	</body>
+</html>
