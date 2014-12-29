@@ -114,6 +114,7 @@ io.on('connection', function(socket) {
 	socket.on('spawn', function(data, reply) {
 		if(typeof login == "undefined") return;
 		console.log(login+" is spawning");
+		socket.emit('server message', {text: "Spawned!"});
 		player = {login: login, object: new Player(scene, terrain, login, false)}
 		playerObjects.push(player);
 		reply();

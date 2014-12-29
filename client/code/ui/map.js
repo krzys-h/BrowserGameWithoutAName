@@ -7,15 +7,15 @@ Map = function(ui, player, terrain, terrainldr)
 	this.generatorStatus = [];
 	
 	this.canvas = document.createElement("canvas");
-	this.canvas.width = this.canvas.height = 600;
+	this.canvas.width = this.canvas.height = 768;
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.texture = new THREE.Texture(this.canvas);
 	this.texture.needsUpdate = true;
 	this.material = new THREE.SpriteMaterial({map: this.texture});
 	this.object = new THREE.Sprite(this.material);
-	this.object.position.set(-WIDTH/2+150, HEIGHT/2-150, 1);
-	this.object.scale.set(200, 200, 1);
+	this.object.position.set(-WIDTH/2+128, HEIGHT/2-128, 1);
+	this.object.scale.set(256, 256, 1);
 	ui.scene.add(this.object);
 }
 

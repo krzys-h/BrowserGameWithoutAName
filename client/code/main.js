@@ -1,7 +1,7 @@
 var renderer;
 var menu, game;
 var ui, input, conn;
-var map;
+var map, chat;
 
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
@@ -10,7 +10,6 @@ var NEAR = 0.1;
 var FAR = 10000;
 
 window.onload = function() {
-	status("Initializing");
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.autoClear = false;
@@ -22,14 +21,21 @@ window.onload = function() {
 	
 	render();
 	
-	status("Connecting to master server");
 	conn = new Connection(function() {
 		status("Master server ready");
 		document.getElementById("login_form").style.display="block";
+		conn.master.on('server message', function(data) {
+			chat.addMessage(data.text, "MASTER SERVER");
+		});
+		conn.master.on('chat', function(data) {
+			chat.addMessage(data.message, data.from);
+		});
 	}, function(data) {
 		if(typeof game == "undefined" || typeof game.player == "undefined") return; //TODO: don't send if not spawned
 		game.objects.net_update(game, data);
 	});
+	chat = new Chat(conn);
+	status("Connecting to master server...");
 }
 
 window.onresize = function() {
@@ -60,6 +66,13 @@ function render() {
 	}
 	renderer.clearDepth();
 	ui.render(renderer);
+
+	input.update();
+	if(isKeyDown("T")) {
+		chat.focus();
+	}
+	resetKeysAfterUpdate();
+	
 	requestAnimationFrame(render);
 }
 
@@ -67,7 +80,6 @@ var chunkQueue = [];
 function update(dt) {
 	document.getElementById("fps_physics").innerHTML = Math.round(game.timer.getAvgFPS());
 	
-	input.update();
 	
 	if(typeof game != "undefined" && typeof game.player != "undefined") {
 		var inputData = input.getInputState();
@@ -90,16 +102,14 @@ function update(dt) {
 		
 		game.player.update();
 	}
-	
-	resetKeysAfterUpdate();
 }
 
 function login()
 {
 	status("Logging in...");
 	document.getElementById("login_form").style.display="none";
-	conn.login(document.getElementById("login").value, "", function(success) {
-		if(!success) return status(success);
+	conn.login(document.getElementById("login").value, "", function(success, msg) {
+		if(!success) return status(msg);
 		status("Waiting on spawn terrain data...");
 		delete menu;
 		menu = undefined; //TODO: Why "delete" doesn't work?
@@ -120,6 +130,9 @@ function login()
 				});
 			}
 		});
+		conn.server.on('server message', function(data) {
+			chat.addMessage(data.text, "SERVER");
+		});
 		conn.server.on('terrain generation status', function(data) {
 			if(typeof map !== "undefined") {
 				map.generatorData(data);
@@ -139,6 +152,7 @@ function status(s) {
 	if(typeof s !== "undefined") {
 		console.log(s);
 		document.getElementById("status").innerHTML = s;
+		chat.addMessage(s, "GAME");
 	} else {
 		document.getElementById("status").innerHTML = "";
 	}

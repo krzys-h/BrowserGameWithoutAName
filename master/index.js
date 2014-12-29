@@ -128,10 +128,14 @@ io_c.on('connection', function(socket) {
 	
 	var hashkey = "randomstring";
 	socket.emit('welcome', {hashkey: hashkey});
+	socket.emit('server message', {text: "There are "+Object.keys(servers).length+" servers currently online"});
 	
+	var login;
 	socket.on('login', function(data, reply) {
 		//if(data.login == "krzys_h" && data.password == crypto.createHash('md5').update("test"+hashkey).digest('hex')) {
 		if(true) {
+			login = data.login;
+			socket.emit('server message', {text: "Welcome, "+data.login+"!"});
 			var sessionid = "somesessionid";
 			var server = servers[pickRandomProperty(servers)];
 			if(typeof server == "undefined") {
@@ -145,6 +149,12 @@ io_c.on('connection', function(socket) {
 		} else {
 			reply({error: true, message: "Bad username or password"});
 		}
+	});
+	
+	socket.on('chat', function(message) {
+		var from = "(Anonymous)";
+		if(typeof login != "undefined") from = login;
+		io_c.emit('chat', {from: from, message: message});
 	});
 
 	socket.on('disconnect', function() {
