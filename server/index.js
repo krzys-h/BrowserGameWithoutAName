@@ -14,6 +14,7 @@ var Terrain = require('../client/code/graphics/terrain.js');
 var Player = require('../client/code/objects/player.js');
 var TerrainLoader = require('../client/code/engine/terrainloader.js');
 
+var os = require('os');
 
 var scene = new Physijs.Scene();
 var terrain = new Terrain(scene, "resources/textures/terrain.png");
@@ -186,6 +187,13 @@ function physics() {
 		}
 	}
 	io.sockets.emit('terrain generation status', chunk_work_data); //TODO: only to admins
+	
+	var server_status = {};
+	server_status.hostname = os.hostname();
+	server_status.load = os.loadavg();
+	server_status.freemem = os.freemem();
+	server_status.totalmem = os.totalmem();
+	io.sockets.emit('server status', server_status);
 	
 	terraingen.run();
 }

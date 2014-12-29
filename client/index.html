@@ -66,6 +66,15 @@
 			#login_form > input, #login_form > button {
 				width: 100%;
 			}
+			#server_status {
+				position: absolute;
+				text-align: right;
+				top: 0;
+				right: 0;
+				color: red;
+				z-index: 100;
+				font-size: 75%;
+			}
 		</style>
 	</head>
 	<body>
@@ -73,6 +82,7 @@
 			<input id="login" type="text" placeholder="login" /><br />
 			<button onclick="login()">START!</button>
 		</div>
+		<div id="server_status"></div>
 		<div id="fps">
 			<span id="chunk_state"></span><br />
 			<span id="status"></span><br />

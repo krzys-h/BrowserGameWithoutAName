@@ -124,6 +124,13 @@ function login()
 				map.generatorData(data);
 			}
 		});
+		conn.server.on('server status', function(data) {
+			var s = "<b>Server status</b><br />";
+			s += data.hostname+"<br />";
+			s += "Avg load: "+data.load[0].toFixed(2)+" "+data.load[1].toFixed(2)+" "+data.load[2].toFixed(2)+"<br />";
+			s += "Mem usage: "+((data.totalmem-data.freemem)/1024/1024).toFixed(2)+" MB / "+(data.totalmem/1024/1024).toFixed(2)+" MB";
+			document.getElementById("server_status").innerHTML = s;
+		});
 	});
 }
 
