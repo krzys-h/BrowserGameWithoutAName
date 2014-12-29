@@ -1,6 +1,6 @@
 function Connection(ready_cb, objects_cb) {
 	this.objects_cb = objects_cb;
-	this.master = io.connect("http://localhost:8888/master");
+	this.master = io.connect("http://"+Config.MASTERSERVER_HOST+":"+Config.MASTERSERVER_PORT+"/master");
 	var conn = this;
 	this.master.on("welcome", function(data) {
 		conn.hashkey = data.hashkey;

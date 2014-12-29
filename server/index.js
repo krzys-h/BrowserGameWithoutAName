@@ -1,7 +1,4 @@
-var SERVER_PORT = 8890;
-var SERVERID = "1234";
-var MASTERSERVER = "localhost";
-var SERVERHOST = "localhost";
+var Config = require('../client/code/config.js');
 
 global.Image = function() {return {addEventListener: function() {}}};
 var THREE = global.THREE = require('./lib/three.js');
@@ -19,7 +16,7 @@ var os = require('os');
 var scene = new Physijs.Scene();
 var terrain = new Terrain(scene, "resources/textures/terrain.png");
 var TerrainGenerator = require('./TerrainGenerator.js');
-var terraingen = new TerrainGenerator("to jest test", function(chunk) {
+var terraingen = new TerrainGenerator(Config.GENERATOR_SEED, function(chunk) {
 	var status;
 	if(typeof chunk.status == "undefined") {
 		terrain.loadChunk(chunk);
@@ -40,8 +37,8 @@ var terrainloader = new TerrainLoader(terrain, function(x, y) {
 });
 terrainloader.load(0, 0, 10);
 
-var io = require('socket.io').listen(SERVER_PORT);
-console.log('Successfully started socket.io server at '+SERVERHOST+':'+SERVER_PORT)
+var io = require('socket.io').listen(Config.SERVER_PORT);
+console.log('Successfully started socket.io server at '+Config.SERVER_HOST+':'+Config.SERVER_PORT)
 
 var playerObjects = [];
 io.on('connection', function(socket) {
@@ -53,7 +50,7 @@ io.on('connection', function(socket) {
 	
 	var login, session;
 	socket.on('login', function(data, reply) {
-		if(data.server != SERVERID) return reply({error: true, message: "Incorrect server ID"});
+		if(data.server != Config.SERVER_ID) return reply({error: true, message: "Incorrect server ID"});
 		console.log("Connection attempt from "+data.login);
 		masterserver.emit('verifysession', {login: data.login, session: data.session}, function(data2) {
 			if(data2.error) {
@@ -115,12 +112,12 @@ io.on('connection', function(socket) {
 		}
 	});
 });
-console.log('Server interface is now running at '+SERVERHOST+':'+SERVER_PORT+'/');
+console.log('Server interface is now running at '+Config.SERVER_HOST+':'+Config.SERVER_PORT+'/');
 
 var io_client = require('socket.io-client');
-var masterserver = io_client('http://'+MASTERSERVER+':8888/masterserver');
+var masterserver = io_client('http://'+Config.MASTERSERVER_HOST+':'+Config.MASTERSERVER_PORT+'/masterserver');
 masterserver.on('connect', function() {
-	masterserver.emit('register', {serverid: SERVERID, ip: SERVERHOST, port: SERVER_PORT});
+	masterserver.emit('register', {serverid: Config.SERVER_ID, ip: Config.SERVER_HOST, port: Config.SERVER_PORT});
 });
 
 setInterval(function() {

@@ -1,22 +1,21 @@
-var HTTP_PORT = 8080; //TODO: This will be hosted by Apache at some point
-var MASTERSERVER_PORT = 8888;
-var SERVERHOST = "localhost";
+var Config = require('../client/code/config.js');
 
 var crypto = require('crypto');
 
 // HTTP server
+//TODO: This will be hosted by Apache at some point
 var static_files = new (require('node-static').Server)('../client');
 require('http').createServer(
 	function (req, res) {
 		static_files.serve(req, res);
 	}
-).listen(HTTP_PORT);
-console.log('HTTP server is now running at http://'+SERVERHOST+':'+HTTP_PORT+'/')
+).listen(Config.HTTP_PORT);
+console.log('HTTP server is now running at http://'+Config.MASTERSERVER_HOST+':'+Config.HTTP_PORT+'/')
 
 
-var io_server = require('socket.io').listen(MASTERSERVER_PORT);
+var io_server = require('socket.io').listen(Config.MASTERSERVER_PORT);
 var io_client = require('socket.io-client');
-console.log('Successfully started socket.io server at '+SERVERHOST+':'+MASTERSERVER_PORT)
+console.log('Successfully started socket.io server at '+Config.MASTERSERVER_HOST+':'+Config.MASTERSERVER_PORT)
 
 function Watchdog(func, time) {
 	this.func = func
@@ -111,7 +110,7 @@ io_s.on('connection', function(socket) {
 		timeout.stop();
 	});
 });
-console.log('Master server server interface is now running at '+SERVERHOST+':'+MASTERSERVER_PORT+'/masterserver');
+console.log('Master server server interface is now running at '+Config.MASTERSERVER_HOST+':'+Config.MASTERSERVER_PORT+'/masterserver');
 
 function pickRandomProperty(obj) {
 	var result;
@@ -152,4 +151,4 @@ io_c.on('connection', function(socket) {
 		console.log('disconnection');
 	});
 });
-console.log('Master server client interface is now running at '+SERVERHOST+':'+MASTERSERVER_PORT+'/master');
+console.log('Master server client interface is now running at '+Config.MASTERSERVER_HOST+':'+Config.MASTERSERVER_PORT+'/master');
