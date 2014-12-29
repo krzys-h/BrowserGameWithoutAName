@@ -12,6 +12,9 @@ var Player = require('../client/code/objects/player.js');
 var TerrainLoader = require('../client/code/engine/terrainloader.js');
 
 var os = require('os');
+var fs = require('fs');
+
+if(!fs.existsSync('./save')) fs.mkdirSync('./save');
 
 var scene = new Physijs.Scene();
 var terrain = new Terrain(scene, "resources/textures/terrain.png");
@@ -19,6 +22,13 @@ var TerrainGenerator = require('./TerrainGenerator.js');
 var terraingen = new TerrainGenerator(Config.GENERATOR_SEED, function(chunk) {
 	var status;
 	if(typeof chunk.status == "undefined") {
+		fs.writeFile("./save/terrain."+chunk.x+"."+chunk.y+".json", JSON.stringify(chunk.data), function(err) {
+			if(err) {
+				console.log("Failed to write terrain file "+chunk.x+","+chunk.y);
+			} else {
+				console.log("Saved terrain chunk "+chunk.x+","+chunk.y+" to disk");
+			}
+		});
 		terrain.loadChunk(chunk);
 		status = "FINISHED";
 	} else {
@@ -33,7 +43,16 @@ var terraingen = new TerrainGenerator(Config.GENERATOR_SEED, function(chunk) {
 	console.log("["+chunk.x+","+chunk.y+"]: "+status);
 });
 var terrainloader = new TerrainLoader(terrain, function(x, y) {
-	terraingen.generate(x, y);
+	if(fs.existsSync("./save/terrain."+x+"."+y+".json")) {
+		console.log("Loading chunk "+x+","+y+" from disk...");
+		fs.readFile("./save/terrain."+x+"."+y+".json", function(err, jsonData) {
+			console.log("Chunk "+x+","+y+" loaded from disk");
+			var data = JSON.parse(jsonData);
+			terrain.loadChunk({x: x, y: y, data: data});
+		});
+	} else {
+		terraingen.generate(x, y);
+	}
 });
 terrainloader.load(0, 0, 10);
 
