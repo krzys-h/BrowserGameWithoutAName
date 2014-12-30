@@ -24,18 +24,17 @@ window.onload = function() {
 	conn = new Connection(function() {
 		status("Master server ready");
 		document.getElementById("login_form").style.display="block";
-		conn.master.on('server message', function(data) {
-			chat.addMessage(data.text, "MASTER SERVER");
-		});
-		conn.master.on('chat', function(data) {
-			chat.addMessage(data.message, data.from);
-		});
-	}, function(data) {
-		if(typeof game == "undefined" || typeof game.player == "undefined") return; //TODO: don't send if not spawned
-		game.objects.net_update(game, data);
 	});
 	chat = new Chat(conn);
 	status("Connecting to master server...");
+	
+	conn.addHandler('server', 'server status', function(data) {
+		var s = "<b>Server status</b><br />";
+		s += data.hostname+"<br />";
+		s += "Avg load: "+data.load[0].toFixed(2)+" "+data.load[1].toFixed(2)+" "+data.load[2].toFixed(2)+"<br />";
+		s += "Mem usage: "+((data.totalmem-data.freemem)/1024/1024).toFixed(2)+" MB / "+(data.totalmem/1024/1024).toFixed(2)+" MB";
+		document.getElementById("server_status").innerHTML = s;
+	});
 }
 
 window.onresize = function() {
@@ -68,8 +67,8 @@ function render() {
 	ui.render(renderer);
 
 	input.update();
-	if(isKeyDown("T")) {
-		chat.focus();
+	if(typeof chat != "undefined") {
+		chat.update();
 	}
 	resetKeysAfterUpdate();
 	
@@ -79,7 +78,6 @@ function render() {
 var chunkQueue = [];
 function update(dt) {
 	document.getElementById("fps_physics").innerHTML = Math.round(game.timer.getAvgFPS());
-	
 	
 	if(typeof game != "undefined" && typeof game.player != "undefined") {
 		var inputData = input.getInputState();
@@ -113,7 +111,7 @@ function login()
 		status("Waiting on spawn terrain data...");
 		delete menu;
 		menu = undefined; //TODO: Why "delete" doesn't work?
-		game = new SceneGame(update);
+		game = new SceneGame(conn, update);
 		terrainloader = new TerrainLoader(game.terrain, function(x, y) {
 			conn.server.emit('request terrain', [{x: x, y: y}]);
 		});
@@ -125,25 +123,10 @@ function login()
 				conn.server.emit('spawn', {}, function() {
 					status("Logged in as <b>"+conn.user+"</b>");
 					game.spawnPlayer(conn.user);
-					map = new Map(ui, game.player, game.terrain, terrainloader);
+					map = new Map(ui, conn, game.player, game.terrain, terrainloader);
 					game.startSimulation();
 				});
 			}
-		});
-		conn.server.on('server message', function(data) {
-			chat.addMessage(data.text, "SERVER");
-		});
-		conn.server.on('terrain generation status', function(data) {
-			if(typeof map !== "undefined") {
-				map.generatorData(data);
-			}
-		});
-		conn.server.on('server status', function(data) {
-			var s = "<b>Server status</b><br />";
-			s += data.hostname+"<br />";
-			s += "Avg load: "+data.load[0].toFixed(2)+" "+data.load[1].toFixed(2)+" "+data.load[2].toFixed(2)+"<br />";
-			s += "Mem usage: "+((data.totalmem-data.freemem)/1024/1024).toFixed(2)+" MB / "+(data.totalmem/1024/1024).toFixed(2)+" MB";
-			document.getElementById("server_status").innerHTML = s;
 		});
 	});
 }

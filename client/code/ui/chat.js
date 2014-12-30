@@ -45,6 +45,10 @@ Chat = function(conn)
 	this.addMessage("Welcome!");
 	
 	document.body.appendChild(this.element);
+	
+	this.conn.addHandler("master", "chat", this, Chat.prototype.messageReceived);
+	this.conn.addHandler("master", "server message", Chat.prototype.serverMessageReceived.bind(this, "MASTER SERVER"));
+	this.conn.addHandler("server", "server message", Chat.prototype.serverMessageReceived.bind(this, "SERVER"));
 }
 
 Chat.prototype.addMessage = function(message, source, color)
@@ -56,6 +60,16 @@ Chat.prototype.addMessage = function(message, source, color)
 	this.element.scrollTop = this.element.scrollHeight;
 }
 
+Chat.prototype.messageReceived = function(data)
+{
+	this.addMessage(data.message, data.from);
+}
+
+Chat.prototype.serverMessageReceived = function(type, data)
+{
+	this.addMessage(data.text, type);
+}
+
 Chat.prototype.submitMessage = function(message)
 {
 	this.conn.master.emit('chat', message);
@@ -63,4 +77,10 @@ Chat.prototype.submitMessage = function(message)
 
 Chat.prototype.focus = function() {
 	document.getElementById(this.input.id).focus();
+}
+
+Chat.prototype.update = function() {
+	if(isKeyDown("T")) {
+		chat.focus();
+	}
 }

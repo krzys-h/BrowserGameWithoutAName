@@ -219,7 +219,7 @@ function physics() {
 	server_status.load = os.loadavg();
 	server_status.freemem = os.freemem();
 	server_status.totalmem = os.totalmem();
-	io.sockets.emit('server status', server_status);
+	io.sockets.emit('server status', server_status); //TODO: only to admins
 	
 	terraingen.run();
 }

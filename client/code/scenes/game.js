@@ -1,4 +1,4 @@
-function SceneGame(update_cb) {
+function SceneGame(conn, update_cb) {
 	this.update_cb = update_cb;
 	
 	this.scene = new Physijs.Scene();
@@ -6,7 +6,7 @@ function SceneGame(update_cb) {
 	this.skybox = new Skybox(this.scene, "resources/textures/skybox/space-*.png");
 	this.terrain = new Terrain(this.scene, "resources/textures/terrain.png");
 	
-	this.objects = new ObjectManager();
+	this.objects = new ObjectManager(this, conn);
 	
 	var ambient = new THREE.AmbientLight(0xFFFFFF);
 	this.scene.add(ambient);

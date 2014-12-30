@@ -1,4 +1,4 @@
-Map = function(ui, player, terrain, terrainldr)
+Map = function(ui, conn, player, terrain, terrainldr)
 {
 	this.player = player;
 	this.terrain = terrain;
@@ -17,6 +17,8 @@ Map = function(ui, player, terrain, terrainldr)
 	this.object.position.set(-WIDTH/2+128, HEIGHT/2-128, 1);
 	this.object.scale.set(256, 256, 1);
 	ui.scene.add(this.object);
+	
+	conn.addHandler('server', 'terrain generation status', this, Map.prototype.generatorData);
 }
 
 Map.prototype.update = function()
