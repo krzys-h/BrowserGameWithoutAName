@@ -1,4 +1,5 @@
 var Config = require('../server-common/config.js');
+var randomString = require('../client/code/common/randomstring.js');
 
 var crypto = require('crypto');
 
@@ -136,7 +137,7 @@ io_c.on('connection', function(socket) {
 		if(true) {
 			login = data.login;
 			socket.emit('server message', {text: "Welcome, "+data.login+"!"});
-			var sessionid = "somesessionid";
+			var sessionid = randomString(16);
 			var server = servers[pickRandomProperty(servers)];
 			if(typeof server == "undefined") {
 				reply({error: true, message: "No servers available"});
