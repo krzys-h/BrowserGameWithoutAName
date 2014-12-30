@@ -31,6 +31,7 @@
 		<script src="/code/engine/game.js"></script>
 		<script src="/code/scenes/mainmenu.js"></script>
 		<script src="/code/scenes/planet.js"></script>
+		<script src="/code/ui/stats.js"></script>
 		<script src="/code/ui/ui.js"></script>
 		<script src="/code/ui/map.js"></script>
 		<script src="/code/ui/chat.js"></script>
@@ -43,17 +44,6 @@
 				padding: 0;
 				border: 0;
 				overflow: hidden;
-			}
-			#fps {
-				position: absolute;
-				bottom: 0px;
-				left: 0px;
-				z-index: 100;
-				color: red;
-				font-size: 200%;
-			}
-			#fps_render, #fps_physics, #status {
-				font-style: italic;
 			}
 			#login_form {
 				position: absolute;
@@ -68,14 +58,15 @@
 			#login_form > input, #login_form > button {
 				width: 100%;
 			}
-			#server_status {
+			#status {
 				position: absolute;
 				text-align: right;
 				top: 0;
 				right: 0;
 				color: red;
 				z-index: 100;
-				font-size: 75%;
+				font-size: 85%;
+				padding: 5px;
 			}
 		</style>
 	</head>
@@ -84,12 +75,6 @@
 			<input id="login" type="text" placeholder="login" /><br />
 			<button onclick="login()">START!</button>
 		</div>
-		<div id="server_status"></div>
-		<div id="fps">
-			<span id="chunk_state"></span><br />
-			<span id="status"></span><br />
-			<b>Render:</b> <span id="fps_render">?</span> FPS<br />
-			<b>Physics:</b> <span id="fps_physics">?</span> FPS
-		</div>
+		<div id="status"></div>
 	</body>
 </html>

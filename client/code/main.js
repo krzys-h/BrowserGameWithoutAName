@@ -1,7 +1,7 @@
 var renderer;
 var menu, game;
 var ui, input, conn;
-var map, chat;
+var stats, chat;
 
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
@@ -19,13 +19,15 @@ window.onload = function() {
 	input = new Input();
 	menu = new SceneMenu();
 	
-	render();
-	
 	conn = new Connection(function() {
 		status("Master server ready");
 		document.getElementById("login_form").style.display="block";
 	});
+	stats = new Stats(conn);
 	chat = new Chat(conn, chat_command);
+	
+	render();
+	
 	status("Connecting to master server...");
 }
 
@@ -47,7 +49,7 @@ window.onresize = function() {
 var renderTimer = new FPS();
 function render() {
 	var dt = renderTimer.update();
-	document.getElementById("fps_render").innerHTML = Math.round(renderTimer.getAvgFPS());
+	stats.updateRenderFPS(renderTimer.getAvgFPS());
 	renderer.clear();
 	if(typeof menu != "undefined") {
 		menu.render(renderer, dt);
@@ -69,7 +71,7 @@ function render() {
 }
 
 function update(dt) {
-	document.getElementById("fps_physics").innerHTML = Math.round(game.timer.getAvgFPS());
+	stats.updatePhysicsFPS(game.timer.getAvgFPS());
 }
 
 function login()
@@ -86,13 +88,9 @@ function login()
 }
 
 function status(s) {
-	if(typeof s !== "undefined") {
-		console.log(s);
-		document.getElementById("status").innerHTML = s;
-		chat.addMessage(s, "GAME");
-	} else {
-		document.getElementById("status").innerHTML = "";
-	}
+	console.log(s);
+	stats.updateStatus(s);
+	chat.addMessage(s, "GAME");
 }
 
 function chat_command(command) {

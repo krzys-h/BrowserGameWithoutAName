@@ -27,15 +27,6 @@ ScenePlanet.prototype.update = function() {
 	this.terrainloader.autoUnload();
 	
 	this.map.update();
-	
-	// TODO: Remove this, we have a map already
-	var s = "";
-	if(this.terrainloader.queue.length > 0) s = "Loading chunks: ";
-	for(var i = 0; i < this.terrainloader.queue.length; i++) {
-		if(i != 0) s += ", ";
-		s += "("+this.terrainloader.queue[i].x+"; "+this.terrainloader.queue[i].y+")";
-	}
-	document.getElementById("chunk_state").innerHTML = s;
 }
 
 if(typeof module !== 'undefined') module.exports = SceneGame;
