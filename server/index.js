@@ -1,4 +1,4 @@
-var Config = require('../client/code/config.js');
+var Config = require('../server-common/config.js');
 
 global.Image = function() {return {addEventListener: function() {}}};
 var THREE = global.THREE = require('./lib/three.js');

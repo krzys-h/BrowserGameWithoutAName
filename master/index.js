@@ -1,4 +1,4 @@
-var Config = require('../client/code/config.js');
+var Config = require('../server-common/config.js');
 
 var crypto = require('crypto');
 
