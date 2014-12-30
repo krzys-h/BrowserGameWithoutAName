@@ -8,7 +8,9 @@ var defaults = {
 
 var fs = require('fs');
 var randomString = require('../client/code/common/randomstring.js');
-var Config = JSON.parse(fs.readFileSync('../config.json'));
+var Config = {};
+if(fs.existsSync('../config.json'))
+	Config = JSON.parse(fs.readFileSync('../config.json'));
 for(var i in defaults) {
 	if(typeof Config[i] == "undefined") {
 		Config[i] = defaults[i];
