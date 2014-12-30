@@ -27,14 +27,6 @@ window.onload = function() {
 	});
 	chat = new Chat(conn, chat_command);
 	status("Connecting to master server...");
-	
-	conn.addHandler('server', 'server status', function(data) {
-		var s = "<b>Server status</b><br />";
-		s += data.hostname+"<br />";
-		s += "Avg load: "+data.load[0].toFixed(2)+" "+data.load[1].toFixed(2)+" "+data.load[2].toFixed(2)+"<br />";
-		s += "Mem usage: "+((data.totalmem-data.freemem)/1024/1024).toFixed(2)+" MB / "+(data.totalmem/1024/1024).toFixed(2)+" MB";
-		document.getElementById("server_status").innerHTML = s;
-	});
 }
 
 window.onresize = function() {
@@ -61,6 +53,7 @@ function render() {
 		menu.render(renderer, dt);
 	}
 	if(typeof game != "undefined") {
+		game.update();
 		game.render(renderer, dt);
 	}
 	renderer.clearDepth();
@@ -77,27 +70,6 @@ function render() {
 
 function update(dt) {
 	document.getElementById("fps_physics").innerHTML = Math.round(game.timer.getAvgFPS());
-	
-	if(typeof game != "undefined" && typeof game.player != "undefined") {
-		var inputData = input.getInputState();
-		if(!game.player.grounded) inputData.jump = false; //TODO: serverside
-		conn.server.emit('control', inputData);
-		
-		var c = game.terrain.posToChunk(game.player.object.position.x, game.player.object.position.z);
-		terrainloader.load(c.x, c.y, 5);
-		terrainloader.autoUnload();
-		
-		var s = "";
-		if(terrainloader.queue.length > 0) s = "Loading chunks: ";
-		for(var i = 0; i < terrainloader.queue.length; i++) {
-			if(i != 0) s += ", ";
-			s += "("+terrainloader.queue[i].x+"; "+terrainloader.queue[i].y+")";
-		}
-		document.getElementById("chunk_state").innerHTML = s;
-		map.update();
-		
-		game.player.update();
-	}
 }
 
 function login()
@@ -106,26 +78,10 @@ function login()
 	document.getElementById("login_form").style.display="none";
 	conn.login(document.getElementById("login").value, "", function(success, msg) {
 		if(!success) return status(msg);
-		status("Waiting on spawn terrain data...");
+		status("Spawning...");
 		delete menu;
 		menu = undefined; //TODO: Why "delete" doesn't work?
-		game = new SceneGame(conn, update);
-		terrainloader = new TerrainLoader(game.terrain, function(x, y) {
-			conn.server.emit('request terrain', [{x: x, y: y}]);
-		});
-		conn.server.on('terrain', function(data) {
-			game.terrain.loadChunk(data);
-			terrainloader.onLoaded(data.x, data.y);
-			if(data.x == 0 && data.y == 0) {
-				status("Spawning...");
-				conn.server.emit('spawn', {}, function() {
-					status("Logged in as <b>"+conn.user+"</b>");
-					game.spawnPlayer(conn.user);
-					map = new Map(ui, conn, game.player, game.terrain, terrainloader);
-					game.startSimulation();
-				});
-			}
-		});
+		game = new Game(ui, input, conn, update);
 	});
 }
 
@@ -141,8 +97,8 @@ function status(s) {
 
 function chat_command(command) {
 	if(command == "debugterrain") {
-		if(typeof game != "undefined" && typeof game.terrain != "undefined") {
-			game.terrain.toggleDebug(!game.terrain.debug);
+		if(typeof game != "undefined" && typeof game.gamescene != "undefined" && typeof game.gamescene.terrain != "undefined") {
+			game.gamescene.terrain.toggleDebug(!game.terrain.debug);
 		} else {
 			chat.addMessage("Game not started", "COMMAND");
 		}

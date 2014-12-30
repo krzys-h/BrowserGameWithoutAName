@@ -1,8 +1,6 @@
-Map = function(ui, conn, player, terrain, terrainldr)
+Map = function(ui, conn, planet)
 {
-	this.player = player;
-	this.terrain = terrain;
-	this.terrainldr = terrainldr;
+	this.planet = planet;
 	
 	this.generatorStatus = [];
 	
@@ -25,40 +23,42 @@ Map.prototype.update = function()
 {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	
-	var center = this.terrain.posToChunk(this.player.object.position.x, this.player.object.position.z, false);
+	if(typeof this.planet.game.player != "undefined") {
+		var center = this.planet.terrain.posToChunk(this.planet.game.player.object.position.x, this.planet.game.player.object.position.z, false);
 	
-	for(var i = 0; i < this.generatorStatus.length; i++) {
-		var job = this.generatorStatus[i];
-		if(this.terrain.chunkLoaded(job.x, job.y)) continue;
+		for(var i = 0; i < this.generatorStatus.length; i++) {
+			var job = this.generatorStatus[i];
+			if(this.planet.terrain.chunkLoaded(job.x, job.y)) continue;
 	
-		var map_x = (job.x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
-		var map_y = (job.y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
-		if(map_x < -TerrainConstants.CHUNKSIZE || map_y < -TerrainConstants.CHUNKSIZE || map_x > this.canvas.width || map_y > this.canvas.height) continue;
-		
-		this.ctx.fillStyle = (job.ready ? "#00FF00" : (job.working ? "#FF0000" : "#0000FF"));
-		this.ctx.fillRect(map_x, map_y, 64, 64);
-		
-		if(this.terrainldr.isQueued(job.x, job.y)) {
-			this.ctx.beginPath();
-			this.ctx.arc(map_x+(TerrainConstants.CHUNKSIZE/2), map_y+(TerrainConstants.CHUNKSIZE/2), 5, 0, 2 * Math.PI, false);
-			this.ctx.fillStyle = "#660066";
-			this.ctx.fill();
-		}
-	}
-	
-	for(var x in this.terrain.chunks) {
-		for(var y in this.terrain.chunks[x]) {
-			var map_x = (x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
-			var map_y = (y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
+			var map_x = (job.x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
+			var map_y = (job.y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
 			if(map_x < -TerrainConstants.CHUNKSIZE || map_y < -TerrainConstants.CHUNKSIZE || map_x > this.canvas.width || map_y > this.canvas.height) continue;
-			this.renderChunk(this.terrain.chunks[x][y], map_x, map_y);
+		
+			this.ctx.fillStyle = (job.ready ? "#00FF00" : (job.working ? "#FF0000" : "#0000FF"));
+			this.ctx.fillRect(map_x, map_y, 64, 64);
+		
+			if(this.planet.terrainloader.isQueued(job.x, job.y)) {
+				this.ctx.beginPath();
+				this.ctx.arc(map_x+(TerrainConstants.CHUNKSIZE/2), map_y+(TerrainConstants.CHUNKSIZE/2), 5, 0, 2 * Math.PI, false);
+				this.ctx.fillStyle = "#660066";
+				this.ctx.fill();
+			}
 		}
-	}
 	
-	this.ctx.beginPath();
-	this.ctx.arc(this.canvas.width/2, this.canvas.height/2, 5, 0, 2 * Math.PI, false);
-	this.ctx.fillStyle = "#990033";
-	this.ctx.fill();
+		for(var x in this.planet.terrain.chunks) {
+			for(var y in this.planet.terrain.chunks[x]) {
+				var map_x = (x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
+				var map_y = (y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
+				if(map_x < -TerrainConstants.CHUNKSIZE || map_y < -TerrainConstants.CHUNKSIZE || map_x > this.canvas.width || map_y > this.canvas.height) continue;
+				this.renderChunk(this.planet.terrain.chunks[x][y], map_x, map_y);
+			}
+		}
+	
+		this.ctx.beginPath();
+		this.ctx.arc(this.canvas.width/2, this.canvas.height/2, 5, 0, 2 * Math.PI, false);
+		this.ctx.fillStyle = "#990033";
+		this.ctx.fill();
+	}
 	
 	this.texture.needsUpdate = true;
 }

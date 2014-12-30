@@ -69,6 +69,7 @@ io.on('connection', function(socket) {
 	});
 	
 	var login, session;
+	var player;
 	socket.on('login', function(data, reply) {
 		if(data.server != Config.SERVER_ID) return reply({error: true, message: "Incorrect server ID"});
 		console.log("Connection attempt from "+data.login);
@@ -78,9 +79,13 @@ io.on('connection', function(socket) {
 			} else {
 				login = data.login;
 				sessionid = data.session;
+				socket.emit('server message', {text: login+" connected"});
 				console.log(login+" is now connected");
 				reply({error: false});
-				sendChunk(0, 0); //send spawn chunk
+				
+				player = {login: login, object: new Player(scene, terrain, login, false)} // create player object
+				playerObjects.push(player);
+				socket.emit('spawn'); // and spawn
 			}
 		});
 	});
@@ -108,18 +113,7 @@ io.on('connection', function(socket) {
 		} else {
 			terraingen.generate(x, y, send);
 		}
-		
 	}
-	
-	var player
-	socket.on('spawn', function(data, reply) {
-		if(typeof login == "undefined") return;
-		console.log(login+" is spawning");
-		socket.emit('server message', {text: "Spawned!"});
-		player = {login: login, object: new Player(scene, terrain, login, false)}
-		playerObjects.push(player);
-		reply();
-	});
 	
 	socket.on('control', function(data) {
 		player.input = data;
