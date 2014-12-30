@@ -7,8 +7,8 @@ function TerrainGenerator(seed, update_callback) {
 	console.log("TerrainGenerator created with seed '"+this.seed+"'");
 }
 
-var BLOCKSIZE = 64;
-var OCTAVES = 7;
+var BLOCKSIZE = TerrainConstants.CHUNKSIZE;
+var OCTAVES = Config.GENERATOR_OCTAVES;
 var md5 = require('MD5'); // For Node.JS
 
 TerrainGenerator.prototype.generate = function(x, y, callback)

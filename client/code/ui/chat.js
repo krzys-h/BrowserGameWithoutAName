@@ -31,15 +31,14 @@ Chat = function(conn)
 	this.input.style.left = 0;
 	this.input.style.width = "100%";
 	//TODO: Why doesn't this.input.onkeypress work?
-	var self = this;
 	window.onkeypress = function(e) {
 		var focused = document.querySelector(":focus");
-		if(e.keyCode == 13 && focused != null && focused.id == self.input.id) {
+		if(e.keyCode == 13 && focused != null && focused.id == this.input.id) {
 			if(focused.value == "") return;
-			self.submitMessage(focused.value);
+			this.submitMessage(focused.value);
 			focused.value = "";
 		}
-	}
+	}.bind(this);
 	this.element.appendChild(this.input);
 	
 	this.addMessage("Welcome!");

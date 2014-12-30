@@ -4,6 +4,7 @@ var defaults = {
 	MASTERSERVER_PORT: 8888,
 	SERVER_HOST: "localhost",
 	SERVER_PORT: 8090,
+	GENERATOR_OCTAVES: 7,
 };
 
 var fs = require('fs');

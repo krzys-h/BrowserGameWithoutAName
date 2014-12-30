@@ -1,4 +1,4 @@
-var Config = require('../server-common/config.js');
+var Config = global.Config = require('../server-common/config.js');
 
 global.Image = function() {return {addEventListener: function() {}}};
 var THREE = global.THREE = require('./lib/three.js');
@@ -6,6 +6,7 @@ var Ammo = global.Ammo = require('./lib/ammo.js');
 var Physijs = global.Physijs = require('./lib/physi.js')(THREE, Ammo);
 
 var FPS = require('../client/code/common/fps.js');
+global.TerrainConstants = require('../client/code/engine/terrainconstants.js');
 global.TerrainChunk = require('../client/code/graphics/terrainchunk.js');
 var Terrain = require('../client/code/graphics/terrain.js');
 var Player = require('../client/code/objects/player.js');
@@ -34,10 +35,10 @@ var terraingen = new TerrainGenerator(Config.GENERATOR_SEED, function(chunk) {
 	} else {
 		status = chunk.status.status;
 		if(status == "generating initial table") {
-			status += " ("+chunk.status.currentRow+"/"+65+")";
+			status += " ("+chunk.status.currentRow+"/"+(TerrainConstants.CHUNKSIZE+1)+")";
 		}
 		if(status == "generating octaves") {
-			status += " ("+chunk.status.currentOctave+"/"+6+")";
+			status += " ("+chunk.status.currentOctave+"/"+Config.GENERATOR_OCTAVES+")";
 		}
 	}
 	console.log("["+chunk.x+","+chunk.y+"]: "+status);
@@ -179,9 +180,8 @@ function physics() {
 		
 		player.update();
 		
-		var cx = Math.floor((player.object.position.x+32)/64);
-		var cy = Math.floor((-player.object.position.z+32)/64);
-		terrainloader.load(cx, cy, 7);
+		var c = terrain.posToChunk(player.object.position.x, player.object.position.z);
+		terrainloader.load(c.x, c.y, 7);
 	}
 	terrainloader.autoUnload();
 	scene.simulate();

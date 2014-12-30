@@ -1,11 +1,11 @@
 function ObjectManager(game, conn) {
+	this.game = game;
 	this.objects = {};
-	conn.addHandler("server", "objects update", this, function(data) {
-		this.net_update(data);
-	});
+	conn.addHandler("server", "objects update", this, ObjectManager.prototype.net_update);
 }
 
 ObjectManager.prototype.net_update = function(data) {
+	if(typeof this.game.player == "undefined") return; //TODO: don't send
 	for(var i=0; i<data.length; i++) {
 		var o = data[i];
 		if(typeof this.objects[o.owner] == "undefined") {

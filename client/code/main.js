@@ -75,7 +75,6 @@ function render() {
 	requestAnimationFrame(render);
 }
 
-var chunkQueue = [];
 function update(dt) {
 	document.getElementById("fps_physics").innerHTML = Math.round(game.timer.getAvgFPS());
 	
@@ -84,9 +83,8 @@ function update(dt) {
 		if(!game.player.grounded) inputData.jump = false; //TODO: serverside
 		conn.server.emit('control', inputData);
 		
-		var cx = Math.floor((game.player.object.position.x+32)/64);
-		var cy = Math.floor((-game.player.object.position.z+32)/64);
-		terrainloader.load(cx, cy, 5);
+		var c = game.terrain.posToChunk(game.player.object.position.x, game.player.object.position.z);
+		terrainloader.load(c.x, c.y, 5);
 		terrainloader.autoUnload();
 		
 		var s = "";

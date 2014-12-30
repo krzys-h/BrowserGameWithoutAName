@@ -41,4 +41,21 @@ Terrain.prototype.unloadChunk = function(x, y) {
 	delete this.chunks[x][y];
 }
 
+Terrain.prototype.posToChunk = function(x, z, round) {
+	if(typeof round == "undefined") round = true;
+	var c = {
+		x: ( x+TerrainConstants.WORLDSIZE/2)/TerrainConstants.WORLDSIZE,
+		y: (-z+TerrainConstants.WORLDSIZE/2)/TerrainConstants.WORLDSIZE
+	}
+	if(round) {
+		c.x = Math.floor(c.x);
+		c.y = Math.floor(c.y);
+	}
+	return c;
+}
+
+Terrain.prototype.chunkToPos = function(x, y) {
+	return {x: x*TerrainConstants.WORLDSIZE, z: y*TerrainConstants.WORLDSIZE};
+}
+
 if(typeof module !== 'undefined') module.exports = Terrain;

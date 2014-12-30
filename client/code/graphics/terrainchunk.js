@@ -3,18 +3,18 @@ function TerrainChunk(chunk, scene, material) {
 	this.y = chunk.y;
 	this.material = material;
 	
-	this.geometry = new THREE.PlaneGeometry(64, 64, 64, 64);
+	this.geometry = new THREE.PlaneGeometry(TerrainConstants.WORLDSIZE, TerrainConstants.WORLDSIZE, TerrainConstants.CHUNKSIZE, TerrainConstants.CHUNKSIZE);
 	this.geometry.dynamic = true;
-	for(var x = 0; x < 64; x++) {
-		for(var y = 0; y < 64; y++) {
+	for(var x = 0; x < TerrainConstants.CHUNKSIZE; x++) {
+		for(var y = 0; y < TerrainConstants.CHUNKSIZE; y++) {
 			this.setAt(x, y, chunk.data[x][y]);
 		}
 	}
 	
-	this.object = new Physijs.HeightfieldMesh(this.geometry, this.material, 0, 64, 64);
-	this.object.position.x = 64*this.x;
+	this.object = new Physijs.HeightfieldMesh(this.geometry, this.material, 0, TerrainConstants.CHUNKSIZE, TerrainConstants.CHUNKSIZE);
+	this.object.position.x = TerrainConstants.WORLDSIZE*this.x;
 	this.object.position.y = -0.5;
-	this.object.position.z = -64*this.y;
+	this.object.position.z = -TerrainConstants.WORLDSIZE*this.y;
 	this.object.rotation.x = Math.PI / 2;
 	scene.add(this.object);
 }
@@ -22,26 +22,26 @@ function TerrainChunk(chunk, scene, material) {
 TerrainChunk.prototype.align = function(axis, other) {
 	console.log("Aligning chunk "+this.x+","+this.y+" to "+other.x+","+other.y+" on "+axis);
 	if(axis == 'x') {
-		for(var y = 0; y < 64; y++) {
-			this.geometry.vertices[y*65+64].z = other.geometry.vertices[y*65+0].z;
+		for(var y = 0; y < TerrainConstants.CHUNKSIZE; y++) {
+			this.setAt(TerrainConstants.CHUNKSIZE, y, other.getAt(0, y));
 		}
-		this.geometry.vertices[64*65+64].z = other.geometry.vertices[63*65+0].z; //TODO: this still leaves small holes
+		this.setAt(TerrainConstants.CHUNKSIZE, TerrainConstants.CHUNKSIZE, other.getAt(0, TerrainConstants.CHUNKSIZE-1)); //TODO: this still leaves small holes
 	}
 	if(axis == 'y') {
-		for(var x = 0; x < 64; x++) {
-			this.geometry.vertices[64*65+x].z = other.geometry.vertices[0*65+x].z;
+		for(var x = 0; x < TerrainConstants.CHUNKSIZE; x++) {
+			this.setAt(x, TerrainConstants.CHUNKSIZE, other.getAt(x, 0));
 		}
-		this.geometry.vertices[64*65+64].z = other.geometry.vertices[0*65+63].z; //TODO: this still leaves small holes
+		this.setAt(TerrainConstants.CHUNKSIZE, TerrainConstants.CHUNKSIZE, other.getAt(TerrainConstants.CHUNKSIZE-1, 0)); //TODO: this still leaves small holes
 	}
 	this.geometry.verticesNeedUpdate = true;
 }
 
 TerrainChunk.prototype.getAt = function(x, y) {
-	return (this.geometry.vertices[y*65+x].z+20)/20;
+	return (this.geometry.vertices[y*(TerrainConstants.CHUNKSIZE+1)+x].z+TerrainConstants.MAXHEIGHT)/TerrainConstants.MAXHEIGHT;
 }
 
 TerrainChunk.prototype.setAt = function(x, y, v) {
-	this.geometry.vertices[y*65+x].z = -20 + v * 20;
+	this.geometry.vertices[y*(TerrainConstants.CHUNKSIZE+1)+x].z = -TerrainConstants.MAXHEIGHT + v * TerrainConstants.MAXHEIGHT;
 }
 
 TerrainChunk.prototype.unload = function() {

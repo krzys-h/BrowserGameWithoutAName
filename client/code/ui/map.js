@@ -25,22 +25,22 @@ Map.prototype.update = function()
 {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	
-	var center_x = (this.player.object.position.x+32)/64;
-	var center_y = (-this.player.object.position.z+32)/64;
+	var center = this.terrain.posToChunk(this.player.object.position.x, this.player.object.position.z, false);
 	
 	for(var i = 0; i < this.generatorStatus.length; i++) {
 		var job = this.generatorStatus[i];
+		if(this.terrain.chunkLoaded(job.x, job.y)) continue;
 	
-		var map_x = (job.x-center_x)*64+(this.canvas.width/2);
-		var map_y = (job.y-center_y)*64+(this.canvas.height/2);
-		if(map_x < -64 || map_y < -64 || map_x > this.canvas.width || map_y > this.canvas.height) continue;
+		var map_x = (job.x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
+		var map_y = (job.y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
+		if(map_x < -TerrainConstants.CHUNKSIZE || map_y < -TerrainConstants.CHUNKSIZE || map_x > this.canvas.width || map_y > this.canvas.height) continue;
 		
 		this.ctx.fillStyle = (job.ready ? "#00FF00" : (job.working ? "#FF0000" : "#0000FF"));
 		this.ctx.fillRect(map_x, map_y, 64, 64);
 		
 		if(this.terrainldr.isQueued(job.x, job.y)) {
 			this.ctx.beginPath();
-			this.ctx.arc(map_x+32, map_y+32, 5, 0, 2 * Math.PI, false);
+			this.ctx.arc(map_x+(TerrainConstants.CHUNKSIZE/2), map_y+(TerrainConstants.CHUNKSIZE/2), 5, 0, 2 * Math.PI, false);
 			this.ctx.fillStyle = "#660066";
 			this.ctx.fill();
 		}
@@ -48,9 +48,9 @@ Map.prototype.update = function()
 	
 	for(var x in this.terrain.chunks) {
 		for(var y in this.terrain.chunks[x]) {
-			var map_x = (x-center_x)*64+(this.canvas.width/2);
-			var map_y = (y-center_y)*64+(this.canvas.height/2);
-			if(map_x < -64 || map_y < -64 || map_x > this.canvas.width || map_y > this.canvas.height) continue;
+			var map_x = (x-center.x)*TerrainConstants.CHUNKSIZE+(this.canvas.width/2);
+			var map_y = (y-center.y)*TerrainConstants.CHUNKSIZE+(this.canvas.height/2);
+			if(map_x < -TerrainConstants.CHUNKSIZE || map_y < -TerrainConstants.CHUNKSIZE || map_x > this.canvas.width || map_y > this.canvas.height) continue;
 			this.renderChunk(this.terrain.chunks[x][y], map_x, map_y);
 		}
 	}
@@ -66,10 +66,10 @@ Map.prototype.update = function()
 Map.prototype.renderChunk = function(chunk, map_x, map_y)
 {
 	if(typeof chunk.imageData == "undefined") {
-		chunk.imageData = this.ctx.createImageData(64, 64);
-		for(var i = 0; i < 64; i++) {
-			for(var j = 0; j < 64; j++) {
-				var index = 4*(i+j*64);
+		chunk.imageData = this.ctx.createImageData(TerrainConstants.CHUNKSIZE, TerrainConstants.CHUNKSIZE);
+		for(var i = 0; i < TerrainConstants.CHUNKSIZE; i++) {
+			for(var j = 0; j < TerrainConstants.CHUNKSIZE; j++) {
+				var index = 4*(i+j*TerrainConstants.CHUNKSIZE);
 				for(var k = 0; k <= 2; k++)
 					chunk.imageData.data[index+k] = chunk.getAt(i, j)*255;
 				chunk.imageData.data[index+3] = 255;

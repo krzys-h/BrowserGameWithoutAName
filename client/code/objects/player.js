@@ -17,7 +17,7 @@ function Player(scene, terrain, name, nametag)
 	this.geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
 	
 	this.object = new Physijs.CapsuleMesh(this.geometry, this.material);
-	this.object.position.set(0, 20, 0);
+	this.object.position.set(0, TerrainConstants.MAXHEIGHT+5, 0); //TODO: Detect terrain height
 	
 	this.object.setCcdMotionThreshold(1);
 	this.object.setCcdSweptSphereRadius(0.2);
