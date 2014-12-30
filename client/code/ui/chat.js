@@ -1,6 +1,7 @@
-Chat = function(conn)
+Chat = function(conn, command_callback)
 {
 	this.conn = conn;
+	this.command_callback = command_callback;
 	
 	this.element = document.createElement("div");
 	this.element.id = "chat";
@@ -71,7 +72,11 @@ Chat.prototype.serverMessageReceived = function(type, data)
 
 Chat.prototype.submitMessage = function(message)
 {
-	this.conn.master.emit('chat', message);
+	if(message[0] == "/") {
+		this.command_callback(message.slice(1));
+	} else {
+		this.conn.master.emit('chat', message);
+	}
 }
 
 Chat.prototype.focus = function() {

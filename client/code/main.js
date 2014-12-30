@@ -25,7 +25,7 @@ window.onload = function() {
 		status("Master server ready");
 		document.getElementById("login_form").style.display="block";
 	});
-	chat = new Chat(conn);
+	chat = new Chat(conn, chat_command);
 	status("Connecting to master server...");
 	
 	conn.addHandler('server', 'server status', function(data) {
@@ -137,4 +137,16 @@ function status(s) {
 	} else {
 		document.getElementById("status").innerHTML = "";
 	}
+}
+
+function chat_command(command) {
+	if(command == "debugterrain") {
+		if(typeof game != "undefined" && typeof game.terrain != "undefined") {
+			game.terrain.toggleDebug(!game.terrain.debug);
+		} else {
+			chat.addMessage("Game not started", "COMMAND");
+		}
+		return;
+	}
+	chat.addMessage("Unknown command", "COMMAND");
 }

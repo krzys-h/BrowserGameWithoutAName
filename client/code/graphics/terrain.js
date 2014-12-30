@@ -19,8 +19,10 @@ Terrain.prototype.loadChunk = function(chunk) {
 	if(typeof this.chunks[chunk.x] == "undefined") this.chunks[chunk.x] = {};
 	console.log("loading chunk "+chunk.x+","+chunk.y);
 	this.chunks[chunk.x][chunk.y] = new TerrainChunk(chunk, this.scene, this.material);
-	this.chunks[chunk.x][chunk.y].gridX.visible = this.debug;
-	this.chunks[chunk.x][chunk.y].gridY.visible = this.debug;
+	if(typeof this.chunks[chunk.x][chunk.y].gridX != "undefined")
+		this.chunks[chunk.x][chunk.y].gridX.visible = this.debug;
+	if(typeof this.chunks[chunk.x][chunk.y].gridY != "undefined")
+		this.chunks[chunk.x][chunk.y].gridY.visible = this.debug;
 	this.alignChunks(this.chunks[chunk.x][chunk.y]);
 }
 
@@ -65,8 +67,10 @@ Terrain.prototype.toggleDebug = function(debug) {
 	this.debug = debug;
 	for(var x in this.chunks) {
 		for(var y in this.chunks[x]) {
-			this.chunks[x][y].gridX.visible = this.debug;
-			this.chunks[x][y].gridY.visible = this.debug;
+			if(typeof this.chunks[x][y].gridX != "undefined")
+				this.chunks[x][y].gridX.visible = this.debug;
+			if(typeof this.chunks[x][y].gridY != "undefined")
+				this.chunks[x][y].gridY.visible = this.debug;
 		}
 	}
 }
