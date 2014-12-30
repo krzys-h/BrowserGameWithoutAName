@@ -55,12 +55,12 @@ var terrainloader = new TerrainLoader(terrain, function(x, y) {
 		terraingen.generate(x, y);
 	}
 });
-terrainloader.load(0, 0, 5);
+terrainloader.load(0, 0, 7);
+var objects = {universe: [], planet: []};
 
 var io = require('socket.io').listen(Config.SERVER_PORT);
 console.log('Successfully started socket.io server at '+Config.SERVER_HOST+':'+Config.SERVER_PORT)
 
-var playerObjects = [];
 io.on('connection', function(socket) {
 	console.log('connection');
 	
@@ -70,6 +70,7 @@ io.on('connection', function(socket) {
 	
 	var login, session;
 	var player;
+	var location = "planet";
 	socket.on('login', function(data, reply) {
 		if(data.server != Config.SERVER_ID) return reply({error: true, message: "Incorrect server ID"});
 		console.log("Connection attempt from "+data.login);
@@ -83,8 +84,8 @@ io.on('connection', function(socket) {
 				console.log(login+" is now connected");
 				reply({error: false});
 				
-				player = {login: login, object: new Player(scene, terrain, login, false)} // create player object
-				playerObjects.push(player);
+				player = new Player(scene, terrain, login, false) // create player object
+				objects[location].push(player);
 				socket.emit('spawn'); // and spawn
 			}
 		});
@@ -118,15 +119,28 @@ io.on('connection', function(socket) {
 	socket.on('control', function(data) {
 		player.input = data;
 		if(player.input.jump/* && player.object.grounded*/)
-			player.object.object.applyCentralImpulse(new THREE.Vector3(0, 10, 0));
+			player.object.applyCentralImpulse(new THREE.Vector3(0, 10, 0));
+	});
+	
+	socket.on('move to', function(target) {
+		var from = location;
+		location = target;
+		for(var i=0; i<objects[from].length; i++) {
+			if(objects[from][i] == player) {
+				objects[from].splice(i, 1);
+				break;
+			}
+		}
+		objects[location].push(player);
 	});
 	
 	socket.on('disconnect', function() {
 		console.log('disconnection');
+		player.unload();
 		if(typeof player !== "undefined") {
-			for(var i=0; i<playerObjects.length; i++) {
-				if(playerObjects[i].object == player) {
-					playerObjects.splice(i, 1);
+			for(var i=0; i<objects[location].length; i++) {
+				if(objects[location][i] == player) {
+					objects[location].splice(i, 1);
 					break;
 				}
 			}
@@ -151,10 +165,10 @@ var timer = new FPS();
 function physics() {
 	var dt = timer.update();
 	
-	terrainloader.load(0, 0, 5);
-	for(var i=0; i<playerObjects.length; i++) {
-		var player = playerObjects[i].object;
-		var input = playerObjects[i].input;
+	terrainloader.load(0, 0, 7);
+	for(var i=0; i<objects["planet"].length; i++) {
+		var player = objects["planet"][i];
+		var input = player.input;
 		if(typeof input == "undefined") continue;
 		
 		var moveDistance = 10 * dt;
@@ -181,12 +195,12 @@ function physics() {
 	scene.simulate();
 	
 	var objdata = [];
-	for(var i=0; i<playerObjects.length; i++) {
+	for(var i=0; i<objects["planet"].length; i++) {
 		var obj = {}
-		obj.owner = playerObjects[i].login;
-		obj.position = playerObjects[i].object.object.position;
-		obj.rotation = playerObjects[i].object.object.rotation;
-		obj.velocity = playerObjects[i].object.object.getLinearVelocity();
+		obj.owner = objects["planet"][i].name;
+		obj.position = objects["planet"][i].object.position;
+		obj.rotation = objects["planet"][i].object.rotation;
+		obj.velocity = objects["planet"][i].object.getLinearVelocity();
 		objdata.push(obj);
 	}
 	io.sockets.emit('objects update', objdata);

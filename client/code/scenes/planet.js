@@ -1,5 +1,6 @@
 function ScenePlanet(game) {
 	this.game = game;
+	this.type = "planet";
 	
 	this.skybox = new Skybox(this.game.scene, "resources/textures/skybox/space-*.png");
 	this.terrain = new Terrain(this.game.scene, "resources/textures/terrain.png");
@@ -10,15 +11,12 @@ function ScenePlanet(game) {
 		this.game.conn.server.emit('request terrain', [{x: x, y: y}]);
 	}.bind(this));
 	
-	this.game.conn.addHandler('server', 'terrain', this, function(data) {
-		this.terrain.loadChunk(data);
-		this.terrainloader.onLoaded(data.x, data.y);
-	});
+	this.game.conn.addHandler('server', 'terrain', this, ScenePlanet.prototype.receiveTerrain);
 	
 	this.map = new Map(this.game.ui, this.game.conn, this);
 	
-	var ambient = new THREE.AmbientLight(0xFFFFFF);
-	this.game.scene.add(ambient);
+	this.light = new THREE.AmbientLight(0xFFFFFF);
+	this.game.scene.add(this.light);
 }
 
 ScenePlanet.prototype.update = function() {
@@ -29,4 +27,16 @@ ScenePlanet.prototype.update = function() {
 	this.map.update();
 }
 
-if(typeof module !== 'undefined') module.exports = SceneGame;
+ScenePlanet.prototype.receiveTerrain = function(data) {
+	this.terrain.loadChunk(data);
+	this.terrainloader.onLoaded(data.x, data.y);
+}
+
+ScenePlanet.prototype.unload = function() {
+	this.game.scene.remove(this.light);
+	this.map.unload();
+	this.game.conn.removeHandlers('server', 'terrain');
+	this.objects.unload();
+	this.terrain.unload();
+	this.skybox.unload();
+}

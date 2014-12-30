@@ -69,3 +69,11 @@ Connection.prototype.attachHandlers = function(type, socket) {
 		}
 	}
 }
+
+Connection.prototype.removeHandlers = function(type, event) {
+	for(var i = 0; i < this.handlers[type][event].length; i++) {
+		if(!this.handlers[type][event][i].attached) continue;
+		this[type].removeListener(event, this.handlers[type][event][i].handler);
+	}
+	this.handlers[type][event] = [];
+}

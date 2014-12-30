@@ -62,11 +62,7 @@ TerrainChunk.prototype.unload = function() {
 		this.object._eventListeners.removed[0]({target: this.object}); //TODO: This is some bug in Physijs/Three.JS, causing a memory leak
 	}
 	delete this.object;
-	if(typeof this.geometry.dispose != "undefined") {
-		this.geometry.dispose();
-	} else {
-		this.geometry.deallocate();
-	}
+	this.geometry.dispose();
 	delete this.geometry;
 	if(typeof this.imageData != "undefined") {
 		delete this.imageData;

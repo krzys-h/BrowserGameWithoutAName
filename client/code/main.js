@@ -96,7 +96,7 @@ function status(s) {
 function chat_command(command) {
 	if(command == "debugterrain") {
 		if(typeof game != "undefined" && typeof game.gamescene != "undefined" && typeof game.gamescene.terrain != "undefined") {
-			game.gamescene.terrain.toggleDebug(!game.terrain.debug);
+			game.gamescene.terrain.toggleDebug(!game.gamescene.terrain.debug);
 		} else {
 			chat.addMessage("Game not started", "COMMAND");
 		}

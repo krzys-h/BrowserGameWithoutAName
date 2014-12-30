@@ -46,7 +46,7 @@ Game.prototype.spawnPlayer = function(username) {
 	this.camera.position.set(0, 2.5, 10)
 	this.player.object.add(this.camera);
 	this.player.label.visible = false;
-	this.gamescene.objects.registerObject(username, this.player);
+	this.gamescene.objects.registerObject(username, this.player, true);
 }
 
 Game.prototype.onResize = function() {
@@ -64,4 +64,20 @@ Game.prototype.update = function() {
 		if(!this.player.grounded) inputData.jump = false; //TODO: serverside
 		this.conn.server.emit('control', inputData);
 	}
+}
+
+Game.prototype.flyOutOfPlanet = function() {
+	if(this.gamescene.type != "planet") return console.error("Not on planet");
+	this.gamescene.unload();
+	this.conn.server.emit('move to', 'universe');
+	this.gamescene = new SceneUniverse(this);
+	this.gamescene.objects.registerObject(this.conn.user, this.player, true);
+}
+
+Game.prototype.landOnPlanet = function() {
+	if(this.gamescene.type != "universe") return console.error("Not in universe!");
+	this.gamescene.unload();
+	this.conn.server.emit('move to', 'planet');
+	this.gamescene = new ScenePlanet(this);
+	this.gamescene.objects.registerObject(this.conn.user, this.player, true);
 }

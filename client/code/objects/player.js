@@ -4,6 +4,7 @@ function Player(scene, terrain, name, nametag)
 	this.terrain = terrain;
 	this.grounded = false;
 	this.name = name;
+	this.scene = scene;
 
 	var materialArray = [];
 	materialArray.push(new THREE.MeshBasicMaterial({color: 0xff3333}));
@@ -26,7 +27,7 @@ function Player(scene, terrain, name, nametag)
 		var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
 		var materialArray = [ materialFront, materialSide ];
-		var textGeom = new THREE.TextGeometry(this.name, 
+		this.labelGeometry = new THREE.TextGeometry(this.name, 
 		{
 			size: 0.5, height: 0.2, curveSegments: 3,
 			font: "helvetiker", weight: "bold", style: "normal",
@@ -36,17 +37,17 @@ function Player(scene, terrain, name, nametag)
 		// font: helvetiker, gentilis, droid sans, droid serif, optimer
 		// weight: normal, bold
 	
-		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-		this.label = new THREE.Mesh(textGeom, textMaterial);
+		this.labelMaterial = new THREE.MeshFaceMaterial(materialArray);
+		this.label = new THREE.Mesh(this.labelGeometry, this.labelMaterial);
 	
-		textGeom.computeBoundingBox();
-		var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+		this.labelGeometry.computeBoundingBox();
+		var textWidth = this.labelGeometry.boundingBox.max.x - this.labelGeometry.boundingBox.min.x;
 	
 		this.label.position.set(-0.5 * textWidth, 2.5, 0);
 		this.object.add(this.label);
 	}
 	
-	scene.add(this.object);
+	this.scene.add(this.object);
 }
 
 Player.prototype.update = function(dt) {
@@ -58,6 +59,19 @@ Player.prototype.update = function(dt) {
 	this.object.rotation.x = 0;
 	this.object.rotation.z = 0;
 	this.object.__dirtyRotation = true;
+}
+
+Player.prototype.unload = function() {
+	if(typeof this.label != "undefined") {
+		this.object.remove(this.label);
+		this.labelGeometry.dispose();
+		for(var i = 0; i < this.labelMaterial.materials.length; i++)
+			this.labelMaterial.materials[i].dispose();
+	}
+	this.scene.remove(this.object);
+	this.geometry.dispose();
+	for(var i = 0; i < this.material.materials.length; i++)
+		this.material.materials[i].dispose();
 }
 
 if(typeof module !== 'undefined') module.exports = Player;

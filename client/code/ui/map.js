@@ -1,5 +1,7 @@
 Map = function(ui, conn, planet)
 {
+	this.ui = ui;
+	this.conn = conn;
 	this.planet = planet;
 	
 	this.generatorStatus = [];
@@ -14,9 +16,9 @@ Map = function(ui, conn, planet)
 	this.object = new THREE.Sprite(this.material);
 	this.object.position.set(-WIDTH/2+128, HEIGHT/2-128, 1);
 	this.object.scale.set(256, 256, 1);
-	ui.scene.add(this.object);
+	this.ui.scene.add(this.object);
 	
-	conn.addHandler('server', 'terrain generation status', this, Map.prototype.generatorData);
+	this.conn.addHandler('server', 'terrain generation status', this, Map.prototype.generatorData);
 }
 
 Map.prototype.update = function()
@@ -81,4 +83,10 @@ Map.prototype.renderChunk = function(chunk, map_x, map_y)
 
 Map.prototype.generatorData = function(data) {
 	this.generatorStatus = data;
+}
+
+Map.prototype.unload = function(data) {
+	this.ui.scene.remove(this.object);
+	this.material.dispose();
+	this.texture.dispose();
 }

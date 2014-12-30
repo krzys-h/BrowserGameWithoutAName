@@ -75,4 +75,16 @@ Terrain.prototype.toggleDebug = function(debug) {
 	}
 }
 
+Terrain.prototype.unload = function() {
+	for(var x in this.chunks) {
+		for(var y in this.chunks[x]) {
+			this.scene.remove(this.chunks[x][y].object);
+			this.chunks[x][y].unload();
+		}
+	}
+	this.chunks = [];
+	this.material.dispose();
+	this.texture.dispose();
+}
+
 if(typeof module !== 'undefined') module.exports = Terrain;
