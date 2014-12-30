@@ -17,6 +17,17 @@ function TerrainChunk(chunk, scene, material) {
 	this.object.position.z = -TerrainConstants.WORLDSIZE*this.y;
 	this.object.rotation.x = Math.PI / 2;
 	scene.add(this.object);
+	
+	this.gridX = new THREE.GridHelper(TerrainConstants.WORLDSIZE, 16);
+	this.gridX.setColors(new THREE.Color(0x006600), new THREE.Color(0x006600));
+	this.gridX.position.set(0, 0.5*TerrainConstants.WORLDSIZE, 0);
+	this.object.add(this.gridX);
+	
+	this.gridY = new THREE.GridHelper(TerrainConstants.WORLDSIZE, 16);
+	this.gridY.setColors(new THREE.Color(0x660000), new THREE.Color(0x660000));
+	this.gridY.position.set(0.5*TerrainConstants.WORLDSIZE, 0, 0);
+	this.gridY.rotation.z = Math.PI / 2;
+	this.object.add(this.gridY);
 }
 
 TerrainChunk.prototype.align = function(axis, other) {

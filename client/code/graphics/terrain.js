@@ -1,6 +1,7 @@
 function Terrain(scene, texture_path)
 {
 	this.scene = scene;
+	this.debug = false;
 	
 	this.texture = new THREE.ImageUtils.loadTexture(texture_path);
 	this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping; 
@@ -18,6 +19,8 @@ Terrain.prototype.loadChunk = function(chunk) {
 	if(typeof this.chunks[chunk.x] == "undefined") this.chunks[chunk.x] = {};
 	console.log("loading chunk "+chunk.x+","+chunk.y);
 	this.chunks[chunk.x][chunk.y] = new TerrainChunk(chunk, this.scene, this.material);
+	this.chunks[chunk.x][chunk.y].gridX.visible = this.debug;
+	this.chunks[chunk.x][chunk.y].gridY.visible = this.debug;
 	this.alignChunks(this.chunks[chunk.x][chunk.y]);
 }
 
@@ -56,6 +59,16 @@ Terrain.prototype.posToChunk = function(x, z, round) {
 
 Terrain.prototype.chunkToPos = function(x, y) {
 	return {x: x*TerrainConstants.WORLDSIZE, z: y*TerrainConstants.WORLDSIZE};
+}
+
+Terrain.prototype.toggleDebug = function(debug) {
+	this.debug = debug;
+	for(var x in this.chunks) {
+		for(var y in this.chunks[x]) {
+			this.chunks[x][y].gridX.visible = this.debug;
+			this.chunks[x][y].gridY.visible = this.debug;
+		}
+	}
 }
 
 if(typeof module !== 'undefined') module.exports = Terrain;
