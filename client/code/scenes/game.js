@@ -13,13 +13,13 @@ function SceneGame(conn, update_cb) {
 	
 	this.running = true;
 	this.timer = new FPS();
-	var game = this;
 	this.scene.addEventListener('update', function() {
-		var dt = game.timer.update();
-		if(!game.running) return;
-		game.update_cb(dt);
-		game.scene.simulate();
-	});
+		var dt = this.timer.update();
+		if(!this.running) return;
+		
+		this.update_cb(dt);
+		this.scene.simulate();
+	}.bind(this));
 }
 
 SceneGame.prototype.startSimulation = function() {
@@ -33,6 +33,7 @@ SceneGame.prototype.stopSimulation = function() {
 
 SceneGame.prototype.render = function(renderer, dt) {
 	if(typeof this.camera == "undefined") return;
+	
 	renderer.render(this.scene, this.camera);
 }
 
