@@ -52,7 +52,9 @@ Player.prototype.update = function(dt) {
 	var collisions = ray.intersectObjects([this.terrain.object]);
 	this.grounded = collisions.length > 0 && collisions[0].distance < 1;*/
 	this.grounded = true; //TODO
-	
+}
+
+Player.prototype.render_update = function() {
 	this.object.rotation.x = 0;
 	this.object.rotation.z = 0;
 	this.object.__dirtyRotation = true;

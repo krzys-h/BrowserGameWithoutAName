@@ -70,6 +70,10 @@ Game.prototype.update = function() {
 		inputData.lookDirection = this.camera.getDirection();
 		this.conn.server.emit('control', inputData);
 	}
+	
+	if(typeof this.player != "undefined") {
+		this.player.render_update();
+	}
 }
 
 Game.prototype.flyOutOfPlanet = function() {
