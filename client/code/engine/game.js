@@ -56,6 +56,12 @@ Game.prototype.onResize = function() {
 }
 
 Game.prototype.update = function() {
+	if(typeof this.camera != "undefined") {
+		var md = this.input.getMouseDelta();
+		this.camera.mouseUpdate(md);
+		this.camera.update();
+	}
+	
 	if(typeof this.gamescene != "undefined") {
 		this.gamescene.update();
 		
@@ -63,12 +69,6 @@ Game.prototype.update = function() {
 		if(!this.player.grounded) inputData.jump = false; //TODO: serverside
 		inputData.lookDirection = this.camera.getDirection();
 		this.conn.server.emit('control', inputData);
-	}
-	
-	if(typeof this.camera != "undefined") {
-		var md = this.input.getMouseDelta();
-		this.camera.mouseUpdate(md);
-		this.camera.update();
 	}
 }
 
