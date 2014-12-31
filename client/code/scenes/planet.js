@@ -2,6 +2,8 @@ function ScenePlanet(game) {
 	this.game = game;
 	this.type = "planet";
 	
+	this.game.scene.setGravity(0, -10, 0);
+	
 	this.skybox = new Skybox(this.game.scene, "resources/textures/skybox/space-*.png");
 	this.terrain = new Terrain(this.game.scene, "resources/textures/terrain.png");
 	

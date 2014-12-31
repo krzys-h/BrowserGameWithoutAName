@@ -2,6 +2,8 @@ function SceneUniverse(game) {
 	this.game = game;
 	this.type = "universe";
 	
+	this.game.scene.setGravity(0, 0, 0);
+	
 	this.skybox = new Skybox(this.game.scene, "resources/textures/skybox/space-*.png");
 	
 	this.objects = new ObjectManager(this.game, this.game.conn);

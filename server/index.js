@@ -70,7 +70,6 @@ io.on('connection', function(socket) {
 	
 	var login, session;
 	var player;
-	var location = "planet";
 	socket.on('login', function(data, reply) {
 		if(data.server != Config.SERVER_ID) return reply({error: true, message: "Incorrect server ID"});
 		console.log("Connection attempt from "+data.login);
@@ -86,7 +85,8 @@ io.on('connection', function(socket) {
 				
 				player = new Player(scene, login, false) // create player object
 				player.socket = socket;
-				objects[location].push(player);
+				player.location = "planet";
+				objects[player.location].push(player);
 				socket.emit('spawn'); // and spawn
 			}
 		});
@@ -123,25 +123,13 @@ io.on('connection', function(socket) {
 			player.object.applyCentralImpulse(new THREE.Vector3(0, 10, 0));
 	});
 	
-	socket.on('move to', function(target) {
-		var from = location;
-		location = target;
-		for(var i=0; i<objects[from].length; i++) {
-			if(objects[from][i] == player) {
-				objects[from].splice(i, 1);
-				break;
-			}
-		}
-		objects[location].push(player);
-	});
-	
 	socket.on('disconnect', function() {
 		console.log('disconnection');
-		player.unload();
-		if(typeof player !== "undefined") {
-			for(var i=0; i<objects[location].length; i++) {
-				if(objects[location][i] == player) {
-					objects[location].splice(i, 1);
+		if(typeof player != "undefined") {
+			player.unload();
+			for(var i=0; i<objects[player.location].length; i++) {
+				if(objects[player.location][i] == player) {
+					objects[player.location].splice(i, 1);
 					break;
 				}
 			}
@@ -161,6 +149,19 @@ setInterval(function() {
 		//console.log('Ping response');
 	});
 }, 10000);
+
+function move_to(object, to) {
+	var from = object.location;
+	object.location = to;
+	for(var i=0; i<objects[from].length; i++) {
+		if(objects[from][i] == object) {
+			objects[from].splice(i, 1);
+			break;
+		}
+	}
+	objects[to].push(object);
+	object.socket.emit('move to', to);
+}
 
 var timer = new FPS();
 function physics() {
@@ -194,6 +195,10 @@ function physics() {
 		
 		var c = terrain.posToChunk(player.object.position.x, player.object.position.z);
 		terrainloader.load(c.x, c.y, 7);
+		
+		if(player.object.position.y > 500) {
+			move_to(player, "universe");
+		}
 	}
 	terrainloader.autoUnload();
 	scene.simulate();

@@ -24,6 +24,13 @@ function Game(ui, input, conn, update_cb) {
 		this.spawnPlayer(this.conn.user);
 		this.startSimulation();
 	});
+	
+	this.conn.addHandler('server', 'move to', this, function(target) {
+		if(target == "universe")
+			this.flyOutOfPlanet();
+		else
+			this.landOnPlanet();
+	});
 }
 
 Game.prototype.startSimulation = function() {

@@ -4,7 +4,7 @@ Camera = function(conn, player) {
 	this.conn = conn;
 	this.player = player;
 	
-	//this.player.object.visible = false;
+	this.player.object.visible = false;
 	this.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, WIDTH/HEIGHT, NEAR, FAR);
 
 	this.yawObject = new THREE.Object3D();
