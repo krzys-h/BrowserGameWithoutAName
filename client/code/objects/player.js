@@ -1,7 +1,6 @@
-function Player(scene, terrain, name, nametag)
+function Player(scene, name, nametag)
 {
 	if(typeof nametag == "undefined") nametag = true;
-	this.terrain = terrain;
 	this.grounded = false;
 	this.name = name;
 	this.scene = scene;
@@ -33,9 +32,7 @@ function Player(scene, terrain, name, nametag)
 			font: "helvetiker", weight: "bold", style: "normal",
 			bevelThickness: 0.1, bevelSize: 0.1, bevelEnabled: true,
 			material: 0, extrudeMaterial: 1
-		});
-		// font: helvetiker, gentilis, droid sans, droid serif, optimer
-		// weight: normal, bold
+		})
 	
 		this.labelMaterial = new THREE.MeshFaceMaterial(materialArray);
 		this.label = new THREE.Mesh(this.labelGeometry, this.labelMaterial);

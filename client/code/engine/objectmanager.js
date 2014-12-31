@@ -10,7 +10,7 @@ ObjectManager.prototype.net_update = function(data) {
 	for(var i=0; i<data.length; i++) {
 		var o = data[i];
 		if(typeof this.objects[o.owner] == "undefined") {
-			this.objects[o.owner] = new Player(this.game.scene, this.game.terrain, o.owner);
+			this.objects[o.owner] = new Player(this.game.scene, o.owner);
 		}
 		this.objects[o.owner].object.position.set(o.position.x, o.position.y, o.position.z);
 		this.objects[o.owner].object.rotation.set(o.rotation.x, o.rotation.y, o.rotation.z);

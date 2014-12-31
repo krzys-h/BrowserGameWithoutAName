@@ -71,6 +71,7 @@ io_s.on('connection', function(socket) {
 				conn.disconnect();
 				console.log('New server '+data.serverid+' connected - '+data.ip+':'+data.port);
 				servers[data.serverid] = {serverid: data.serverid, ip: data.ip, port: data.port};
+				io_c.emit('server message', {text: 'New server connected'});
 			});
 		});
 	});
@@ -107,6 +108,7 @@ io_s.on('connection', function(socket) {
 		console.log('server disconnection');
 		if(typeof serverid != 'undefined') {
 			delete servers[serverid];
+			io_c.emit('server message', {text: 'Lost connection to server'});
 		}
 		timeout.stop();
 	});

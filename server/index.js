@@ -84,7 +84,8 @@ io.on('connection', function(socket) {
 				console.log(login+" is now connected");
 				reply({error: false});
 				
-				player = new Player(scene, terrain, login, false) // create player object
+				player = new Player(scene, login, false) // create player object
+				player.socket = socket;
 				objects[location].push(player);
 				socket.emit('spawn'); // and spawn
 			}
@@ -174,10 +175,13 @@ function physics() {
 		var moveDistance = 10 * dt;
 		var rotateAngle = Math.PI*2 * 0.15 * dt;
 		
-		var rotObjectMatrix = new THREE.Matrix4();
+		/*var rotObjectMatrix = new THREE.Matrix4();
 		rotObjectMatrix.makeRotationAxis(new THREE.Vector3(0, 1, 0), input.movement.y*rotateAngle);
 		player.object.matrix.multiply(rotObjectMatrix);
-		player.object.rotation.setEulerFromRotationMatrix(player.object.matrix);
+		player.object.rotation.setEulerFromRotationMatrix(player.object.matrix);*/
+		if(input.movement.x != 0) {
+			player.object.rotation.y = input.lookDirection;
+		}
 		
 		player.object.translateZ(input.movement.x*moveDistance);
 			
