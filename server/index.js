@@ -196,7 +196,7 @@ function physics() {
 		var c = terrain.posToChunk(player.object.position.x, player.object.position.z);
 		terrainloader.load(c.x, c.y, 7);
 		
-		if(player.object.position.y > 500) {
+		if(player.object.position.y > 2500) {
 			move_to(player, "universe");
 		}
 	}

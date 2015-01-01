@@ -2,7 +2,7 @@ function Skybox(scene, image_path)
 {
 	this.scene = scene;
 	
-	this.geometry = new THREE.CubeGeometry(10000, 10000, 10000);
+	this.geometry = new THREE.CubeGeometry(100000, 100000, 100000);
 	
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var materialArray = [];

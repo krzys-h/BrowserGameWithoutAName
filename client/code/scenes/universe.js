@@ -10,6 +10,8 @@ function SceneUniverse(game) {
 	
 	this.light = new THREE.AmbientLight(0xFFFFFF);
 	this.game.scene.add(this.light);
+	
+	this.planet = new Planet(this.game.scene, "resources/textures/terrain.png");
 }
 
 SceneUniverse.prototype.update = function() {

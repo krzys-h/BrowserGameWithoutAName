@@ -7,7 +7,7 @@ var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
 var VIEW_ANGLE = 45;
 var NEAR = 0.1;
-var FAR = 10000;
+var FAR = 100000;
 
 window.onload = function() {
 	renderer = new THREE.WebGLRenderer();
